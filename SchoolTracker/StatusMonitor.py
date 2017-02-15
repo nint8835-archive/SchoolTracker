@@ -1,8 +1,10 @@
+import os
 import threading
 from typing import List
 
 import time
 
+import logging
 import requests
 
 from .School import School
@@ -12,6 +14,8 @@ from .DispatcherManager import DispatcherManager
 class StatusMonitor(threading.Thread):
 
     def __init__(self, dispatcher_manager: DispatcherManager, schools: List[dict]):
+        super(StatusMonitor, self).__init__()
+        self.logger = logging.getLogger("StatusMonitor")
         self.dispatcher_manager = dispatcher_manager
         self.schools = []  # type: List[School]
 
@@ -19,7 +23,7 @@ class StatusMonitor(threading.Thread):
             self.schools.append(School(self, **school))
 
         self.running = False
-        self.first_check = True
+        self.first_check = not os.getenv("SCHOOLTRACKER_DEBUG", False)
 
     def run(self):
         self.running = True
@@ -40,13 +44,14 @@ class StatusMonitor(threading.Thread):
             span = after_school.split("<br/>")[3]
             status_list = span.split(";\">")[1].split("<span style=\"color: grey;\"></span>")[0].split(
                 "</span><br>")
-            status = "\n".join(
-                [i.replace("<br/>", "").replace("<br>", "").split("<span")[0].strip().capitalize() for i in
+            status = ". ".join(
+                [i.replace("<br/>", "").replace("<br>", "").split("<span")[0].strip().rstrip(".").capitalize() for i in
                  status_list])
         else:
             status = "School open"
 
         if status != school.last_status:
+            self.logger.info("Status for {} updated. New status: {}".format(school.name, status))
             self.dispatch_notification(school, status)
             school.last_status = status
 

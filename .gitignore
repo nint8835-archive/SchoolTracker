@@ -1,1 +1,4 @@
 .idea/
+*.pyc
+schools.json
+twitter_config.json
