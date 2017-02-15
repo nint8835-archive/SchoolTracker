@@ -7,6 +7,7 @@ import sys
 import textwrap
 import threading
 
+import time
 import tweepy
 import tweepy.error
 
@@ -16,7 +17,7 @@ from .NotificationDispatcher import NotificationDispatcher
 
 class TweetQueue(threading.Thread):
 
-    def __init__(self, dispatcher: TwitterDispatcher):
+    def __init__(self, dispatcher):
         super(TweetQueue, self).__init__()
         self.dispatcher = dispatcher
         self.queue = []
@@ -24,7 +25,9 @@ class TweetQueue(threading.Thread):
     def run(self):
         while True:
             if len(self.queue) > 0:
-                tweet = self.queue.pop()
+                tweet = self.queue.pop(0)
+                self.dispatcher.api.update_status(tweet)
+            time.sleep(60)
 
 
 class TwitterDispatcher(NotificationDispatcher):
@@ -61,12 +64,15 @@ class TwitterDispatcher(NotificationDispatcher):
                               "twitter_config.json and restart.")
             sys.exit(1)
 
+        self.queue = TweetQueue(self)
+        self.queue.start()
+
     def dispatch_notification(self, school: School, new_status: str):
         twitter = getattr(school, "twitter", school.name)
         tweet = self.config["TWEET_FORMAT"].format(twitter=twitter, status=new_status)
         truncated_tweet = textwrap.shorten(tweet, 140, placeholder="...")
         if not os.getenv("SCHOOLTRACKER_DEBUG", False):
-            self.api.update_status(truncated_tweet)
+            self.queue.queue.append(truncated_tweet)
         else:
             self.logger.debug(truncated_tweet)
 
