@@ -2,3 +2,4 @@
 *.pyc
 schools.json
 twitter_config.json
+pushover_config.json
