@@ -5,12 +5,26 @@ import logging
 
 import sys
 import textwrap
+import threading
 
 import tweepy
 import tweepy.error
 
 from ..School import School
 from .NotificationDispatcher import NotificationDispatcher
+
+
+class TweetQueue(threading.Thread):
+
+    def __init__(self, dispatcher: TwitterDispatcher):
+        super(TweetQueue, self).__init__()
+        self.dispatcher = dispatcher
+        self.queue = []
+
+    def run(self):
+        while True:
+            if len(self.queue) > 0:
+                tweet = self.queue.pop()
 
 
 class TwitterDispatcher(NotificationDispatcher):
