@@ -12,6 +12,8 @@ from .NotificationDispatcher import NotificationDispatcher
 
 class PushoverDispatcher(NotificationDispatcher):
 
+    dispatcher_name = "PUSHOVER"
+
     def __init__(self):
         self.logger = logging.getLogger("PushoverDispatcher")
         self.logger.debug("Loading Pushover config info...")

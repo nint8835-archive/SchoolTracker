@@ -15,6 +15,8 @@ from .NotificationDispatcher import NotificationDispatcher
 
 class TwitterDispatcher(NotificationDispatcher):
 
+    dispatcher_name = "TWITTER"
+
     def __init__(self):
         self.logger = logging.getLogger("TwitterDispatcher")
         self.logger.debug("Loading Twitter config info...")
