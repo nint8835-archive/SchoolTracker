@@ -11,3 +11,6 @@ class DispatcherManager(object):
     def dispatch_notification(self, school: School, new_status: str):
         for dispatcher in self._dispatchers:
             dispatcher.dispatch_notification(school, new_status)
+
+    def register_dispatcher(self, dispatcher: NotificationDispatcher):
+        self._dispatchers.append(dispatcher())
