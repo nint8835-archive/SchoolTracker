@@ -28,7 +28,7 @@ class TwitterDispatcher(NotificationDispatcher):
                 "CONSUMER_SECRET": "",
                 "ACCESS_KEY": "",
                 "ACCESS_SECRET": "",
-                "TWEET_FORMAT": "Status for {twitter} updated. New status: {status}"
+                "TWEET_FORMAT": "Status for {twitter} updated. New status: {status} #nlschools"
             }
             with open(os.path.join(os.getcwd(), "twitter_config.json"), "w") as f:
                 json.dump(self.config, f, indent=4, sort_keys=True)
