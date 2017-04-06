@@ -36,7 +36,10 @@ class StatusMonitor(threading.Thread):
             time.sleep(60)
 
     def check_status(self, school: School):
-        page_response = requests.get("https://www.nlesd.ca/schools/statusreport/")
+        try:
+            page_response = requests.get("https://www.nlesd.ca/schools/statusreport/")
+        except requests.HTTPError:
+            return
         resp_text = page_response.text.replace("\r", "").replace("\n", "")
         if resp_text.count(school.name) != 0:
             # Brace for bootleg text parsing
